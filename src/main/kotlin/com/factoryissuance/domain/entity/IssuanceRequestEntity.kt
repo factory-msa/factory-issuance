@@ -1,7 +1,6 @@
 package com.factoryissuance.domain.entity
 
 import com.factoryissuance.domain.entity.support.IssuanceRequestCode
-import com.factoryissuance.domain.entity.support.IssuanceResultCode
 import support.domain.BaseTimeEntity
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -18,13 +17,15 @@ class IssuanceRequestEntity(
     @Column(name = "ISSUANCE_REQUEST_ID", nullable = false)
     var issuanceRequestId: String,
 
+    @Column(name = "TRANSACTION_ID", nullable = false)
+    var transactionId: String,
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "ISSUANCE_REQUEST_CODE", nullable = false)
     var issuanceRequestCode: IssuanceRequestCode,
 
-    @Enumerated(value = EnumType.STRING)
     @Column(name = "ISSUANCE_RESULT_CODE")
-    var issuanceResultCode: IssuanceResultCode,
+    var issuanceResultCode: String,
 
     @Column(name = "PRICE", nullable = false)
     var price: Long,
