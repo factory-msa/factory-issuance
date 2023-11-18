@@ -9,7 +9,7 @@ class ApiResponse<T>(
 ) {
 
     companion object {
-        private val SUCCESS_CODE: String = "0000"
+        private const val SUCCESS_CODE: String = "0000"
 
         fun <T> ok(result: T?): ApiResponse<T> {
             return ApiResponse(SUCCESS_CODE, HttpStatus.OK.reasonPhrase, result)
