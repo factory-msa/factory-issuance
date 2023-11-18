@@ -12,8 +12,8 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "ISSUANCE_REQUEST")
-class IssuanceRequestEntity(
+@Table(name = "ISSUANCE_REQUEST_HISTORY")
+class IssuanceRequestHistoryEntity(
 
     @Column(name = "TRANSACTION_ID", nullable = false)
     var transactionId: String,
