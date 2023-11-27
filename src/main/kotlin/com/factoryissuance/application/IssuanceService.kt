@@ -1,32 +1,25 @@
 package com.factoryissuance.application
 
+import com.factoryissuance.domain.entity.IssuanceCouponEntity
+import com.factoryissuance.domain.entity.support.IssuanceCouponId
 import com.factoryissuance.domain.exception.BusinessException
 import com.factoryissuance.domain.repository.IdGenerator
+import com.factoryissuance.domain.repository.IssuanceCouponJpaRepository
 import com.factoryissuance.infrastructure.httpclient.CouponService
-import com.factoryissuance.infrastructure.httpclient.ProductService
 import com.factoryissuance.infrastructure.httpclient.dto.CouponIssuanceApiRequest
-import com.factoryissuance.infrastructure.httpclient.exception.ProductNotFoundException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import support.logging.logger
 import support.time.DateUtils.Companion.toLocalDateTime
+import java.util.*
 
 @Service
 class IssuanceService(
-    private val issuanceRequestService: IssuanceRequestService,
-    private val productService: ProductService,
+    private val idGenerator: IdGenerator,
     private val couponService: CouponService,
-    private val idGenerator: IdGenerator
+    private val issuanceRepository: IssuanceCouponJpaRepository
 ) {
 
-    @Transactional
     fun issueCoupons(command: CouponIssuanceCommand): CouponIssuanceResponse {
-        validateTransactionId(command.transactionId)
-
-        issuanceRequestService.save(command)
-
-        validateProduct(command.productId)
-
         val issuanceId = idGenerator.next()
 
         return try {
@@ -40,6 +33,12 @@ class IssuanceService(
                     toLocalDateTime(command.couponExpiredEnd)
                 )
             )
+
+            val couponNumbers = response.result!!.couponNumbers
+
+            // TODO: GlobalTransactionId 변경 필요 (Header or Body 에서 가져오도록 수정 - GlobalHeader)
+            saveIssuanceCoupons(couponNumbers, issuanceId, UUID.randomUUID().toString())
+
             CouponIssuanceResponse.success(issuanceId, response.result!!.couponNumbers)
         } catch (ex: RuntimeException) {
             logger.error(
@@ -53,27 +52,14 @@ class IssuanceService(
         }
     }
 
-    private fun validateTransactionId(transactionId: String) {
-        if (alreadyExistIssuanceRequestHistory(transactionId)) {
-            val message = "발급 요청 이력이 이미 존재합니다. 트랜잭션 ID: `$transactionId`"
-            logger.error(message)
-
-            throw RuntimeException(message)
+    private fun saveIssuanceCoupons(couponNumbers: List<String>, issuanceId: String, globalTransactionId: String) {
+        val issuanceCoupons = couponNumbers.map {
+            IssuanceCouponEntity(
+                IssuanceCouponId(issuanceId, UUID.randomUUID().toString()), it
+            )
         }
-    }
 
-    private fun alreadyExistIssuanceRequestHistory(transactionId: String) =
-        issuanceRequestService.existsByTransactionId(transactionId)
-
-    private fun validateProduct(productId: String) {
-        val product = productService.findProductById(productId).result
-
-        if (product == null) {
-            val message = "상품 정보가 존재하지 않습니다, 상품 ID: `{$productId}`"
-            logger.error(message)
-
-            throw ProductNotFoundException(message)
-        }
+        issuanceRepository.saveAll(issuanceCoupons)
     }
 
     companion object {
