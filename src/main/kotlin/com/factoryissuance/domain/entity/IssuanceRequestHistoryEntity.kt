@@ -16,7 +16,11 @@ import javax.persistence.Table
 class IssuanceRequestHistoryEntity(
 
     @Column(name = "TRANSACTION_ID", nullable = false)
-    var transactionId: String,
+    var transactionId: String, // 클라이언트가 전달해주는 ID
+
+    // 글로벌 트랜잭션 ID (게이트웨이에서 생성 및 Header 에 존재하는 값) & 인덱스 설정 필요
+    @Column(name = "ISSUANCE_REQUEST_ID")
+    var issuanceRequestId: String,
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "ISSUANCE_REQUEST_CODE", nullable = false)
@@ -29,9 +33,9 @@ class IssuanceRequestHistoryEntity(
     var quantity: Int,
 
     @Id
-    @Column(name = "ISSUANCE_REQUEST_ID", nullable = false)
+    @Column(name = "ISSUANCE_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var issuanceRequestId: Long? = null
+    var issuanceId: Long? = null,
 
 ) : BaseTimeEntity() {
 
