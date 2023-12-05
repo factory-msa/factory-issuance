@@ -1,16 +1,15 @@
 package com.factoryissuance.application
 
 import com.factoryissuance.domain.entity.IssuanceCouponEntity
-import com.factoryissuance.domain.entity.support.IssuanceCouponId
 import com.factoryissuance.domain.exception.BusinessException
 import com.factoryissuance.domain.repository.IdGenerator
 import com.factoryissuance.domain.repository.IssuanceCouponJpaRepository
 import com.factoryissuance.infrastructure.httpclient.CouponService
 import com.factoryissuance.infrastructure.httpclient.dto.CouponIssuanceApiRequest
 import org.springframework.stereotype.Service
+import support.header.FactoryRequestHolder
 import support.logging.logger
 import support.time.DateUtils.Companion.toLocalDateTime
-import java.util.*
 
 @Service
 class IssuanceService(
@@ -35,9 +34,9 @@ class IssuanceService(
             )
 
             val couponNumbers = response.result!!.couponNumbers
+            val globalTransactionId = FactoryRequestHolder.getGlobalTransactionId()
 
-            // TODO: GlobalTransactionId 변경 필요 (Header or Body 에서 가져오도록 수정 - GlobalHeader)
-            saveIssuanceCoupons(couponNumbers, issuanceId, UUID.randomUUID().toString())
+            saveIssuanceCoupons(couponNumbers, issuanceId, globalTransactionId)
 
             CouponIssuanceResponse.success(issuanceId, response.result!!.couponNumbers)
         } catch (ex: RuntimeException) {
@@ -55,7 +54,7 @@ class IssuanceService(
     private fun saveIssuanceCoupons(couponNumbers: List<String>, issuanceId: String, globalTransactionId: String) {
         val issuanceCoupons = couponNumbers.map {
             IssuanceCouponEntity(
-                IssuanceCouponId(issuanceId, UUID.randomUUID().toString()), it
+                issuanceId, globalTransactionId, it
             )
         }
 

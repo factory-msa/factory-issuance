@@ -12,6 +12,9 @@ import javax.persistence.Table
 @Table(name = "ISSUANCE_COUPON")
 class IssuanceCouponEntity(
 
+    @Column(name = "ISSUANCE_ID", nullable = false)
+    var issuanceId: String,
+
     @Column(name = "ISSUANCE_REQUEST_ID", nullable = false)
     var issuanceRequestId: String, // globalTransactionId,
 
