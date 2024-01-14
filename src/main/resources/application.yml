@@ -18,7 +18,7 @@ server:
 
 eureka:
   instance:
-    instance-id: factory-issuance-service
+    instance-id: issuance-service
   client:
     register-with-eureka: true
     fetch-registry: true
