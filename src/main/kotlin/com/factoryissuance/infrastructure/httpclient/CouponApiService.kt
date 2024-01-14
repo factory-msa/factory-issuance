@@ -16,12 +16,12 @@ class CouponApiService(private val restTemplate: RestTemplate) : CouponService {
     private val logger = logger()
 
     override fun issueCoupons(request: CouponIssuanceApiRequest): ApiResponse<CouponIssuanceApiResponse> {
-        val uri = "http://localhost:10001/api/v1/issue-coupons"
+        val uri = "http://localhost:10001/api/v1/coupons/issue"
 
         return try {
             restTemplate.exchange(uri, HttpMethod.POST, HttpEntity(request), TYPE_REF).body!!
         } catch (ex: RuntimeException) {
-            logger.error("쿠폰 API 호출에 실패하였습니다. 호출 URL: $uri, 실패사유: ${ex.message}")
+            logger.error("쿠폰 발급 API 호출에 실패하였습니다. 호출 URL: $uri, 실패사유: ${ex.message}")
 
             // TODO: 예외 타입 변경
             throw IllegalStateException(ex.message)
