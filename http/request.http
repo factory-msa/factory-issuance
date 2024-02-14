@@ -3,10 +3,10 @@ POST http://localhost:8000/api/v1/issuance/coupons/issue
 Content-Type: application/json
 
 {
-  "transactionId": "test-transaction-id35",
+  "transactionId": "{{$random.uuid}}",
   "productId": "P0001",
-  "issuanceQuantity": 10,
+  "issuanceQuantity": 100,
   "price": 10000,
-  "couponExpiredStart": "20231001000000",
-  "couponExpiredEnd": "20231031235959"
+  "couponExpiredStart": "20240101000000",
+  "couponExpiredEnd": "20240131235959"
 }
